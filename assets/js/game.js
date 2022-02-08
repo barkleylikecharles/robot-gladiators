@@ -6,7 +6,7 @@
 
 
 var randomNumber = function(min, max) {
-    var value = Math.floor(Math.random() * (max - min + 1) + min); 
+    var value = Math.floor(Math.random() * (max - min) + min); 
 
     return value;
 };
@@ -24,18 +24,17 @@ var fightOrSkip = function() {
     // if player picks "skip" confirm and then stop the loop
     if (promptFight === "skip") {
         var confirmSkip = window.confirm("Are you sure you'd like to quit?");
-    }
   
       // if yes (true), leave fight
       if (confirmSkip) {
         window.alert(playerInfo.name + " has decided to skip this fight. Goodbye!");
         // subtract money from playerMoney for skipping
-        playerInfo.playerMoney = playerInfo.money - 10;
-        shop();
+        playerInfo.money = Math.max(0, playerInfo.money - 10);
         return true;
-        return false;
       }
     }
+        return false;
+    };
 
 var fight = function(enemy) {
 
@@ -90,22 +89,23 @@ var fight = function(enemy) {
    
 
 var startGame = function() {
-    for (var i = 0; i < enemyInfo.length; i++) {
+    
         playerInfo.reset();
+        for (var i =0; i < enemyInfo.length; i++) {
+            console.log(playerInfo);
 
         if (playerInfo.health > 0) {
             window.alert("Welcome to Robot Gladiators! Round " + (i + 1));
-            debugger;
     
             var pickedEnemyObj = enemyInfo[i];
     
             pickedEnemyObj.health = randomNumber(40, 60);
-            // debugger;
+            console.log(pickedEnemyObj);
 
             fight(pickedEnemyObj);
 
             if (playerInfo.health > 0 && i < enemyInfo.length - 1) {
-                shop();
+
                 var storeConfirm = window.confirm("The fight is over, visit the store before the next round");
 
                 if (storeConfirm) {
@@ -122,12 +122,24 @@ var startGame = function() {
 };
 
 var endGame = function() {
-    if (playerInfo.health > 0) {
-        window.alert("Great job, you've survived the game! You now have a score of " + playerInfo.money + ".");
+    window.alert("The game has now ended. Let's see how you did");
+
+    var highScore = localStorage.getItem("highscore");
+    if (highScore === null) {
+        highScore = 0;
+    }
+
+    if (playerInfo.money > highScore) {
+        localStorage.setItem("highscore", playerInfo.money);
+        localStorage.setItem("name", playerInfo.name);
+
+        alert(playerInfo.name + " now has a high score of " + playerInfo.money + "!");
+
     }
     else {
-    window.alert("You've lost your robot in battle.");
+        alert(playerInfo.name + " did not beat the high score of " + highScore + " . Maybe next time!");
     }
+
     var playAgainConfirm = window.confirm("Would you like to play again?");
 
     if (playAgainConfirm) {
@@ -140,7 +152,8 @@ var endGame = function() {
 
 var shop = function() {
 
-    var shopOptionPrompt = window.prompt("Would you like to REFILL our health, UPGRADE your attack, or LEAVE the store? Please enter one: 'REFILL', 'UPGRADE', or 'LEAVE' to make a choice.");
+    var shopOptionPrompt = window.prompt("Would you like to REFILL our health, UPGRADE your attack, or LEAVE the store? Please enter one 1 for REFILL, 2 for UPGRADE, or 3 for LEAVE");
+    
     shopOptionPrompt = parseInt(shopOptionPrompt);
     switch (shopOptionPrompt) {
         case 1:
@@ -150,7 +163,7 @@ var shop = function() {
             playerInfo.upgradeAttack();
             break;
         case 3:
-            window.alert("Leaving the store");
+            window.alert("Leaving the store.");
             break; 
         default: 
             window.alert("You did not pick a valid option. Try again.");
@@ -217,10 +230,6 @@ var enemyInfo = [
     }
 ];
 
-console.log(enemyInfo);
-console.log(enemyInfo [0]);
-console.log(enemyInfo[0].name);
-console.log(enemyInfo[0]['attack']);
 startGame();
 
 //fight(enemyRobot);
